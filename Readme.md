@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Андрей Корсак](https://up.htmlacademy.ru/javascript/18/user/1054987).
-* Наставник: `Неизвестно`.
+* Наставник: [Олег Петров](https://up.htmlacademy.ru/javascript/18/user/42390).
 
 ---
 
