@@ -41,6 +41,7 @@
      */
     function onPinClick() {
       var mapCard = window.map.mapMain.querySelector('.map__card');
+
       if (mapCard) {
         mapCard.remove();
       }
@@ -62,10 +63,10 @@
     var pinsFragment = document.createDocumentFragment();
     var closerOffer;
 
-    for (var e = 0; e < data.length; e++) {
-      closerOffer = createOffer(data[e]);
+    data.forEach(function (element) {
+      closerOffer = createOffer(element);
       pinsFragment.appendChild(closerOffer);
-    }
+    });
 
     return pinsFragment;
   }

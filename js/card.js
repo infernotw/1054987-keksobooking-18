@@ -1,9 +1,14 @@
 'use strict';
 
 (function () {
-  var keycode = {
+  var Keycode = {
     ENTER: 13,
     ESC: 27
+  };
+
+  var photoParams = {
+    WIDTH: 45,
+    HEIGHT: 40
   };
 
   var rooms = ['комната', 'комнаты', 'комнат'];
@@ -28,12 +33,11 @@
     var featuresFragment = document.createDocumentFragment();
     var featuresElement;
 
-    for (var q = 0; q < features.length; q++) {
+    features.forEach(function (feature) {
       featuresElement = document.createElement('li');
-      featuresElement.className = 'popup__feature popup__feature--' + features[q];
-
+      featuresElement.className = 'popup__feature popup__feature--' + feature;
       featuresFragment.appendChild(featuresElement);
-    }
+    });
 
     return featuresFragment;
   }
@@ -49,20 +53,41 @@
     var photosElement;
     var photoImg;
 
-    for (var w = 0; w < photos.length; w++) {
+    photos.forEach(function (photo) {
       photosTemplate = cardTemplate.content.querySelector('.popup__photos');
       photosElement = photosTemplate.cloneNode(true);
       photoImg = photosElement.querySelector('img');
 
-      photoImg.src = photos[w];
-      photoImg.width = 45;
-      photoImg.height = 40;
+      photoImg.src = photo;
+      photoImg.width = photoParams.WIDTH;
+      photoImg.height = photoParams.HEIGHT;
       photoImg.alt = 'offer image';
 
       photosFragment.appendChild(photosElement);
-    }
+    });
 
     return photosFragment;
+  }
+
+  /**
+   * удаляю карточку
+   */
+  function removeCard() {
+    var adElement = document.querySelector('.map__card');
+    if (adElement) {
+      adElement.remove();
+    }
+  }
+
+  /**
+   * событие, происходящее по нажатию на ESC
+   * @param {Object} evt
+   * @param {any} func
+   */
+  function onEscDown(evt, func) {
+    if (evt.keyCode === Keycode.ESC) {
+      func();
+    }
   }
 
   /**
@@ -86,19 +111,30 @@
     cardElement.querySelector('.popup__photos').innerHTML = '';
     cardElement.querySelector('.popup__photos').appendChild(createPhotos(card.offer.photos));
 
-    var closeCard = cardElement.querySelector('.popup__close');
+    var closeCardButton = cardElement.querySelector('.popup__close');
+
+    /**
+     * закрытие карточки
+     */
+    function closeCard() {
+      cardElement.remove();
+
+      closeCardButton.removeEventListener('click', closeCard);
+      document.removeEventListener('keydown', onCardEsc);
+    }
+
+    /**
+     * закрытие карточки по нажатию на ESC
+     * @param {Object} evt
+     */
+    function onCardEsc(evt) {
+      onEscDown(evt, closeCard);
+    }
 
     // закрытие карточки по клику
-    closeCard.addEventListener('click', function () {
-      cardElement.remove();
-    });
-
+    closeCardButton.addEventListener('click', closeCard);
     // закрытие карточки по нажатию ESC
-    document.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === keycode.ESC) {
-        cardElement.remove();
-      }
-    });
+    document.addEventListener('keydown', onCardEsc);
 
     cardFragment.appendChild(cardElement);
     window.map.mapMain.insertBefore(cardFragment, cardFilter);
@@ -107,7 +143,9 @@
   }
 
   window.card = {
-    keycode: keycode,
-    renderCard: renderCard
+    Keycode: Keycode,
+    onEscDown: onEscDown,
+    renderCard: renderCard,
+    removeCard: removeCard
   };
 })();

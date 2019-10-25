@@ -3,17 +3,28 @@
 (function () {
   var mapMain = document.querySelector('.map');
   var mapPins = document.querySelector('.map__pins');
-  var mapFilters = document.querySelector('.map__filters');
-  var mapFiltersSelect = mapFilters.querySelectorAll('select');
+  var mapPinMain = mapMain.querySelector('.map__pin--main');
+  var mapFiltersSelect = window.form.mapFilters.querySelectorAll('select');
+  var isFirstLoad = true;
   var isActivate = false;
   var addressInput = window.form.adForm.querySelector('#address');
 
+  /**
+   * при успешном получении данных с сервера
+   * @param {array} data - получаемые данные с сервера
+   */
   function onLoadSuccess(data) {
-    mapPins.appendChild(window.pin.createPins(data));
+    window.allPins = data;
+    var allPinsSliced = window.allPins.slice(0, window.filter.MAX_PINS);
+    mapPins.appendChild(window.pin.createPins(allPinsSliced));
   }
 
+  /**
+   * ошибка при получении данных с сервера
+   * @param {string} errorText
+   */
   var onLoadError = function (errorText) {
-    window.utils.getErrorMessage(errorText);
+    window.error.getErrorMessage(errorText);
   };
 
   /**
@@ -24,20 +35,26 @@
     window.form.adForm.classList.remove('ad-form--disabled');
     window.form.adFormFieldsets.forEach(window.form.removeDisableAttribute);
     mapFiltersSelect.forEach(window.form.removeDisableAttribute);
+    window.form.mapFiltersFeatures.forEach(window.form.removeDisableAttribute);
   }
 
   mapFiltersSelect.forEach(window.form.setDisableAttribute);
+  window.form.mapFiltersFeatures.forEach(window.form.setDisableAttribute);
 
   /**
    * однократная активация по клику мыши
    */
   function enablePageByMouse() {
-    if (!isActivate) {
+    if (isFirstLoad ? !isActivate : !window.map.isActivate) {
+      if (isFirstLoad) {
+        isFirstLoad = false;
+      }
       isActivate = true;
+      window.map.isActivate = true;
       activatePage();
       window.backend.load(onLoadSuccess, onLoadError);
     }
-    window.map.writeAddress();
+    writeAddress();
   }
 
   /**
@@ -45,21 +62,29 @@
    * @param {Object} evt
    */
   function enablePageByKey(evt) {
-    if (!isActivate) {
-      if (evt.keyCode === window.card.keycode.ENTER) {
+    if (isFirstLoad ? !isActivate : !window.map.isActivate) {
+      if (isFirstLoad) {
+        isFirstLoad = false;
+      }
+      if (evt.keyCode === window.card.Keycode.ENTER) {
         isActivate = true;
+        window.map.isActivate = true;
         activatePage();
         window.backend.load(onLoadSuccess, onLoadError);
       }
     }
-    window.map.writeAddress();
+    writeAddress();
   }
 
   window.pin.mapPinMain.addEventListener('mousedown', enablePageByMouse);
   window.pin.mapPinMain.addEventListener('keydown', enablePageByKey);
 
   // изначальные координаты метки в неактивном состоянии карты
-  addressInput.value = Math.round(window.pin.mapPinMain.offsetLeft + window.pin.mapPinMain.offsetWidth / 2) + ', ' + Math.round(window.pin.mapPinMain.offsetTop + window.pin.mapPinMain.offsetHeight / 2);
+  function writeInactiveAdress() {
+    addressInput.value = Math.round(window.pin.mapPinMain.offsetLeft + window.pin.mapPinMain.offsetWidth / 2) + ', ' + Math.round(window.pin.mapPinMain.offsetTop + window.pin.mapPinMain.offsetHeight / 2);
+  }
+
+  writeInactiveAdress();
 
   /**
    * определение координат метки при активном состоянии карты
@@ -134,6 +159,9 @@
   window.map = {
     mapPins: mapPins,
     mapMain: mapMain,
-    writeAddress: writeAddress
+    mapFiltersSelect: mapFiltersSelect,
+    writeInactiveAdress: writeInactiveAdress,
+    isActivate: isActivate,
+    mapPinMain: mapPinMain
   };
 })();
