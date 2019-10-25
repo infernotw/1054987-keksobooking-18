@@ -1,6 +1,16 @@
 'use strict';
 
 (function () {
+  var PIN_DEFAULT = {
+    X: 570,
+    Y: 375
+  };
+  var OFFER_PRICE = {
+    'bungalo': 0,
+    'flat': 1000,
+    'house': 5000,
+    'palace': 10000
+  };
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
   var adFormRoomsNumber = adForm.querySelector('#room_number');
@@ -11,12 +21,36 @@
   var adFormTimeOut = adForm.querySelector('#timeout');
   var adFormPrice = adForm.querySelector('#price');
   var adFormType = adForm.querySelector('#type');
-  var OFFER_PRICE = {
-    'bungalo': 0,
-    'flat': 1000,
-    'house': 5000,
-    'palace': 10000
-  };
+  var resetButton = adForm.querySelector('.ad-form__reset');
+  var mapFilters = document.querySelector('.map__filters');
+  var mapFiltersFeatures = mapFilters.querySelectorAll('input');
+
+  /**
+   * парметры неактивной страницы
+   */
+  function deactivatePage() {
+    adForm.reset();
+    mapFilters.reset();
+    window.filter.removePins();
+    window.photoLoad.removePhotos();
+    roomsOpeningStatus();
+    window.map.mapMain.classList.add('map--faded');
+    adForm.classList.add('ad-form--disabled');
+    adFormFieldsets.forEach(setDisableAttribute);
+    window.map.mapFiltersSelect.forEach(setDisableAttribute);
+    mapFiltersFeatures.forEach(setDisableAttribute);
+    window.card.removeCard();
+    window.map.mapPinMain.style.left = PIN_DEFAULT.X + 'px';
+    window.map.mapPinMain.style.top = PIN_DEFAULT.Y + 'px';
+    window.map.isActivate = false;
+  }
+
+  // действия при нажатии на кнопку "очистить"
+  resetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    deactivatePage();
+    window.map.writeInactiveAdress();
+  });
 
   /**
    * устанавливаю элементам массива атрибут disabled
@@ -27,6 +61,7 @@
   }
 
   adFormFieldsets.forEach(setDisableAttribute);
+  mapFiltersFeatures.forEach(setDisableAttribute);
 
   /**
    * удаляю у элементов массива атрибут disabled
@@ -37,11 +72,15 @@
   }
 
   // начальное состояние выбора комнат и гостей
-  adFormGuestsNumber.selectedIndex = 2;
-  guestsOptions[0].disabled = true;
-  guestsOptions[1].disabled = true;
-  guestsOptions[2].disabled = false;
-  guestsOptions[3].disabled = true;
+  function roomsOpeningStatus() {
+    adFormGuestsNumber.selectedIndex = 2;
+    guestsOptions[0].disabled = true;
+    guestsOptions[1].disabled = true;
+    guestsOptions[2].disabled = false;
+    guestsOptions[3].disabled = true;
+  }
+
+  roomsOpeningStatus();
 
   // устанавливаю подходящие условия при выборе количества комнат
   adFormRoomsNumber.addEventListener('change', function () {
@@ -156,7 +195,26 @@
   adFormTimeIn.addEventListener('change', timeInSelect);
   adFormTimeOut.addEventListener('change', timeOutSelect);
 
+  function formSubmitSuccessHandler() {
+    window.success.getSuccessMessage();
+    deactivatePage();
+  }
+
+  function formSubmitErrorHandler(errorMessage) {
+    window.error.getErrorMessage(errorMessage);
+  }
+
+  function formSubmitHandler(evt) {
+    evt.preventDefault();
+    var data = new FormData(adForm);
+    window.backend.upload(formSubmitSuccessHandler, formSubmitErrorHandler, data);
+  }
+
+  adForm.addEventListener('submit', formSubmitHandler);
+
   window.form = {
+    mapFilters: mapFilters,
+    mapFiltersFeatures: mapFiltersFeatures,
     adForm: adForm,
     adFormFieldsets: adFormFieldsets,
     setDisableAttribute: setDisableAttribute,

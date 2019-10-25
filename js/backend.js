@@ -2,14 +2,14 @@
 
 (function () {
   var serverUrls = {
-    LOAD: 'https://js.dump.academy/keksobooking/data'
+    LOAD: 'https://js.dump.academy/keksobooking/data',
+    UPLOAD: 'https://js.dump.academy/keksobooking/'
   };
 
   var TIMEOUT = 10000;
 
-  function createXhr(method, url, onSuccess, onError) {
+  function createXhr(method, url, onSuccess, onError, data) {
     var xhr = new XMLHttpRequest();
-
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
@@ -41,14 +41,19 @@
 
     xhr.timeout = TIMEOUT;
     xhr.open(method, url);
-    xhr.send();
+    xhr.send(data);
   }
 
   function load(onSuccess, onError) {
     createXhr('GET', serverUrls.LOAD, onSuccess, onError);
   }
 
+  function upload(onSuccess, onError, data) {
+    createXhr('POST', serverUrls.UPLOAD, onSuccess, onError, data);
+  }
+
   window.backend = {
-    load: load
+    load: load,
+    upload: upload
   };
 })();
