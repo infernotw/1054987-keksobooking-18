@@ -13,9 +13,21 @@
   };
   var adForm = document.querySelector('.ad-form');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
+  var adFormLables = adForm.querySelectorAll('label');
+  var adFormButtons = adForm.querySelectorAll('button');
   var adFormRoomsNumber = adForm.querySelector('#room_number');
   var adFormGuestsNumber = adForm.querySelector('#capacity');
   var guestsOptions = adFormGuestsNumber.querySelectorAll('option');
+  var guestsParams = {
+    ANY: guestsOptions[0],
+    ONE_GUEST: guestsOptions[1],
+    TWO_GUESTS: guestsOptions[2],
+    NOT_FOR_GUESTS: guestsOptions[3],
+  };
+  var guestsIndex = {
+    ONE: 2,
+    NO_ONE: 3
+  };
   var adFormTitle = adForm.querySelector('#title');
   var adFormTimeIn = adForm.querySelector('#timein');
   var adFormTimeOut = adForm.querySelector('#timeout');
@@ -33,12 +45,14 @@
     mapFilters.reset();
     window.filter.removePins();
     window.photoLoad.removePhotos();
-    roomsOpeningStatus();
+    setDefaultRoomsStatus();
     window.map.mapMain.classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
     adFormFieldsets.forEach(setDisableAttribute);
     window.map.mapFiltersSelect.forEach(setDisableAttribute);
     mapFiltersFeatures.forEach(setDisableAttribute);
+    adFormButtons.forEach(setDisableAttribute);
+    adFormLables.forEach(setDisableAttribute);
     window.card.removeCard();
     window.map.mapPinMain.style.left = PIN_DEFAULT.X + 'px';
     window.map.mapPinMain.style.top = PIN_DEFAULT.Y + 'px';
@@ -58,6 +72,7 @@
    */
   function setDisableAttribute(elem) {
     elem.setAttribute('disabled', 'disabled');
+    elem.style.cursor = 'default';
   }
 
   adFormFieldsets.forEach(setDisableAttribute);
@@ -69,18 +84,19 @@
    */
   function removeDisableAttribute(elem) {
     elem.removeAttribute('disabled');
+    elem.style.cursor = 'pointer';
   }
 
   // начальное состояние выбора комнат и гостей
-  function roomsOpeningStatus() {
-    adFormGuestsNumber.selectedIndex = 2;
-    guestsOptions[0].disabled = true;
-    guestsOptions[1].disabled = true;
-    guestsOptions[2].disabled = false;
-    guestsOptions[3].disabled = true;
+  function setDefaultRoomsStatus() {
+    adFormGuestsNumber.selectedIndex = guestsIndex.ONE;
+    guestsParams.ANY.disabled = true;
+    guestsParams.ONE_GUEST.disabled = true;
+    guestsParams.TWO_GUESTS.disabled = false;
+    guestsParams.NOT_FOR_GUESTS.disabled = true;
   }
 
-  roomsOpeningStatus();
+  setDefaultRoomsStatus();
 
   // устанавливаю подходящие условия при выборе количества комнат
   adFormRoomsNumber.addEventListener('change', function () {
@@ -88,32 +104,32 @@
 
     switch (roomsNumber) {
       case '1':
-        adFormGuestsNumber.selectedIndex = 2;
-        guestsOptions[0].disabled = true;
-        guestsOptions[1].disabled = true;
-        guestsOptions[2].disabled = false;
-        guestsOptions[3].disabled = true;
+        adFormGuestsNumber.selectedIndex = guestsIndex.ONE;
+        guestsParams.ANY.disabled = true;
+        guestsParams.ONE_GUEST.disabled = true;
+        guestsParams.TWO_GUESTS.disabled = false;
+        guestsParams.NOT_FOR_GUESTS.disabled = true;
         break;
       case '2':
-        adFormGuestsNumber.selectedIndex = 2;
-        guestsOptions[0].disabled = true;
-        guestsOptions[1].disabled = false;
-        guestsOptions[2].disabled = false;
-        guestsOptions[3].disabled = true;
+        adFormGuestsNumber.selectedIndex = guestsIndex.ONE;
+        guestsParams.ANY.disabled = true;
+        guestsParams.ONE_GUEST.disabled = false;
+        guestsParams.TWO_GUESTS.disabled = false;
+        guestsParams.NOT_FOR_GUESTS.disabled = true;
         break;
       case '3':
-        adFormGuestsNumber.selectedIndex = 2;
-        guestsOptions[0].disabled = false;
-        guestsOptions[1].disabled = false;
-        guestsOptions[2].disabled = false;
-        guestsOptions[3].disabled = true;
+        adFormGuestsNumber.selectedIndex = guestsIndex.ONE;
+        guestsParams.ANY.disabled = false;
+        guestsParams.ONE_GUEST.disabled = false;
+        guestsParams.TWO_GUESTS.disabled = false;
+        guestsParams.NOT_FOR_GUESTS.disabled = true;
         break;
       default:
-        adFormGuestsNumber.selectedIndex = 3;
-        guestsOptions[0].disabled = true;
-        guestsOptions[1].disabled = true;
-        guestsOptions[2].disabled = true;
-        guestsOptions[3].disabled = false;
+        adFormGuestsNumber.selectedIndex = guestsIndex.NO_ONE;
+        guestsParams.ANY.disabled = true;
+        guestsParams.ONE_GUEST.disabled = true;
+        guestsParams.TWO_GUESTS.disabled = true;
+        guestsParams.NOT_FOR_GUESTS.disabled = false;
     }
   });
 
@@ -181,29 +197,40 @@
   /**
    * функция одинаковой смены времени при выборе заезда
    */
-  function timeInSelect() {
+  function setTimeInSelect() {
     adFormTimeOut.value = adFormTimeIn.value;
   }
 
   /**
    * функция одинаковой смены времени при выборе выезда
    */
-  function timeOutSelect() {
+  function setTimeOutSelect() {
     adFormTimeIn.value = adFormTimeOut.value;
   }
 
-  adFormTimeIn.addEventListener('change', timeInSelect);
-  adFormTimeOut.addEventListener('change', timeOutSelect);
+  adFormTimeIn.addEventListener('change', setTimeInSelect);
+  adFormTimeOut.addEventListener('change', setTimeOutSelect);
 
+  /**
+   * успешная отправка формы
+   */
   function formSubmitSuccessHandler() {
     window.success.getSuccessMessage();
     deactivatePage();
   }
 
+  /**
+   * ошибка при отправке формы
+   * @param {sting} errorMessage
+   */
   function formSubmitErrorHandler(errorMessage) {
     window.error.getErrorMessage(errorMessage);
   }
 
+  /**
+   * отравка формы
+   * @param {Object} evt
+   */
   function formSubmitHandler(evt) {
     evt.preventDefault();
     var data = new FormData(adForm);
@@ -216,6 +243,8 @@
     mapFilters: mapFilters,
     mapFiltersFeatures: mapFiltersFeatures,
     adForm: adForm,
+    adFormLables: adFormLables,
+    adFormButtons: adFormButtons,
     adFormFieldsets: adFormFieldsets,
     setDisableAttribute: setDisableAttribute,
     removeDisableAttribute: removeDisableAttribute

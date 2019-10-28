@@ -10,7 +10,8 @@
   var MUFFIN_PHOTO = 'img/muffin-grey.svg';
   var photoParams = {
     WIDTH: '70px',
-    HEIGHT: '70px'
+    HEIGHT: '70px',
+    MARGIN: '0 10px 10px 0'
   };
 
   // добавляю фотографию (для карты) при нажатии
@@ -18,9 +19,7 @@
     var avatar = avatarChooser.files[0];
     var avatarName = avatar.name.toLowerCase();
 
-    var matchesAvatar = FILE_TYPES.some(function (it) {
-      return avatarName.endsWith(it);
-    });
+    var matchesAvatar = hasMatchesPhotos(avatarName);
 
     if (matchesAvatar) {
       var avatarReader = new FileReader();
@@ -40,17 +39,26 @@
     var photosArray = Array.from(photos);
 
     photosArray.forEach(function (photo) {
-      var photosName = photos.name.toLowerCase();
+      var photosName = photo.name.toLowerCase();
 
-      var matchesPhotos = FILE_TYPES.some(function (it) {
-        return photosName.endsWith(it);
-      });
+      var matchesPhotos = hasMatchesPhotos(photosName);
 
       if (matchesPhotos) {
         renderPhotos(photo);
       }
     });
   });
+
+  /**
+   *
+   * @param {string} name
+   * @return {boolean}
+   */
+  function hasMatchesPhotos(name) {
+    return FILE_TYPES.some(function (it) {
+      return name.endsWith(it);
+    });
+  }
 
   /**
    * создаю отображение раздела фотографий жилья
@@ -65,6 +73,7 @@
 
       image.style.width = photoParams.WIDTH;
       image.style.height = photoParams.HEIGHT;
+      image.style.margin = photoParams.MARGIN;
 
       photoPreview.appendChild(image);
     });
