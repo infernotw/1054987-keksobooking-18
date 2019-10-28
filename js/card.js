@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var Keycode = {
+  var KEY_CODES = {
     ENTER: 13,
     ESC: 27
   };
@@ -73,9 +73,10 @@
    * удаляю карточку
    */
   function removeCard() {
-    var adElement = document.querySelector('.map__card');
-    if (adElement) {
-      adElement.remove();
+    var mapCard = document.querySelector('.map__card');
+
+    if (mapCard) {
+      mapCard.remove();
     }
   }
 
@@ -85,8 +86,8 @@
    * @param {any} func
    */
   function onEscDown(evt, func) {
-    if (evt.keyCode === Keycode.ESC) {
-      func();
+    if (evt.keyCode === KEY_CODES.ESC) {
+      func(evt);
     }
   }
 
@@ -118,6 +119,7 @@
      */
     function closeCard() {
       cardElement.remove();
+      window.pin.removePinActiveClass(cardElement);
 
       closeCardButton.removeEventListener('click', closeCard);
       document.removeEventListener('keydown', onCardEsc);
@@ -143,7 +145,7 @@
   }
 
   window.card = {
-    Keycode: Keycode,
+    KEY_CODES: KEY_CODES,
     onEscDown: onEscDown,
     renderCard: renderCard,
     removeCard: removeCard

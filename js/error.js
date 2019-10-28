@@ -9,17 +9,21 @@
 
     /**
      * закрытие окна с ошибкой
+     * @param {Object} evt
      */
-    function closeError() {
-      main.removeChild(errorElement);
-
-      errorButton.removeEventListener('click', closeError);
-      document.removeEventListener('click', closeError);
-      document.removeEventListener('keydown', onErrorEsc);
+    function closeError(evt) {
+      // проверка наличия keyCode.ESC
+      // если есть, то перезагрузка страницы не происходит
+      if (evt.keyCode === window.card.KEY_CODES.ESC) {
+        main.removeChild(errorElement);
+      } else {
+        document.location.reload();
+        main.removeChild(errorElement);
+      }
     }
 
     errorButton.addEventListener('click', closeError);
-    document.addEventListener('click', closeError);
+    document.addEventListener('mousedown', closeError);
     document.addEventListener('keydown', onErrorEsc);
 
     /**
@@ -32,6 +36,8 @@
 
     errorElement.querySelector('.error__message').textContent = errorMessage;
     main.appendChild(errorElement);
+
+    errorButton.focus();
   }
 
   window.error = {

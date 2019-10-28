@@ -40,7 +40,8 @@
      * открытие новой карточки при нажатии на маркер
      */
     function onPinClick() {
-      var mapCard = window.map.mapMain.querySelector('.map__card');
+      var mapCard = document.querySelector('.map__card');
+      removePinActiveClass(offerPin);
 
       if (mapCard) {
         mapCard.remove();
@@ -71,9 +72,20 @@
     return pinsFragment;
   }
 
+  function removePinActiveClass(pin) {
+    var pins = document.querySelectorAll('.map__pin[type="button"]');
+
+    pins.forEach(function (elem) {
+      elem.classList.remove('map__pin--active');
+    });
+
+    pin.classList.add('map__pin--active');
+  }
+
   window.pin = {
     pinParams: pinParams,
     mapPinMain: mapPinMain,
+    removePinActiveClass: removePinActiveClass,
     createOffer: createOffer,
     createPins: createPins
   };
