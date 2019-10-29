@@ -11,7 +11,7 @@
   var photoParams = {
     WIDTH: '70px',
     HEIGHT: '70px',
-    MARGIN: '0 10px 10px 0'
+    MARGIN: '0 0 10px'
   };
 
   // добавляю фотографию (для карты) при нажатии

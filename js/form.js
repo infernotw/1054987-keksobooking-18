@@ -12,6 +12,7 @@
     'palace': 10000
   };
   var adForm = document.querySelector('.ad-form');
+  var adFormTimeContainer = adForm.querySelector('.ad-form__element--time');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
   var adFormLables = adForm.querySelectorAll('label');
   var adFormButtons = adForm.querySelectorAll('button');
@@ -63,7 +64,7 @@
   resetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
     deactivatePage();
-    window.map.writeInactiveAdress();
+    window.map.setInactiveAdress();
   });
 
   /**
@@ -194,22 +195,19 @@
   adFormType.addEventListener('change', setTypeOrPrice);
   adFormPrice.addEventListener('change', setTypeOrPrice);
 
-  /**
-   * функция одинаковой смены времени при выборе заезда
-   */
-  function setTimeInSelect() {
-    adFormTimeOut.value = adFormTimeIn.value;
-  }
+  // синхронная смена времени отъезда/заезда
+  adFormTimeContainer.addEventListener('change', function (evt) {
+    var targetValue = evt.target.value;
 
-  /**
-   * функция одинаковой смены времени при выборе выезда
-   */
-  function setTimeOutSelect() {
-    adFormTimeIn.value = adFormTimeOut.value;
-  }
-
-  adFormTimeIn.addEventListener('change', setTimeInSelect);
-  adFormTimeOut.addEventListener('change', setTimeOutSelect);
+    switch (targetValue) {
+      case adFormTimeIn.value:
+        adFormTimeOut.value = adFormTimeIn.value;
+        break;
+      case adFormTimeOut.value:
+        adFormTimeIn.value = adFormTimeOut.value;
+        break;
+    }
+  });
 
   /**
    * успешная отправка формы
@@ -217,6 +215,7 @@
   function formSubmitSuccessHandler() {
     window.success.getSuccessMessage();
     deactivatePage();
+    window.map.setInactiveAdress();
   }
 
   /**

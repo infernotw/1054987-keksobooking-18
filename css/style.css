@@ -808,6 +808,7 @@ fieldset {
 .ad-form__photo {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
 
   min-width: 70px;
   min-height: 70px;

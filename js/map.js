@@ -60,7 +60,7 @@
       activatePage();
       window.backend.load(onLoadSuccess, onLoadError);
     }
-    writeAddress();
+    setAddress();
   }
 
   /**
@@ -84,17 +84,17 @@
   window.pin.mapPinMain.addEventListener('keydown', enablePageByKey);
 
   // изначальные координаты метки в неактивном состоянии карты
-  function writeInactiveAdress() {
+  function setInactiveAdress() {
     addressInput.value = Math.round(window.pin.mapPinMain.offsetLeft + window.pin.mapPinMain.offsetWidth / 2) +
       ', ' + Math.round(window.pin.mapPinMain.offsetTop + window.pin.mapPinMain.offsetHeight / 2);
   }
 
-  writeInactiveAdress();
+  setInactiveAdress();
 
   /**
    * определение координат метки при активном состоянии карты
    */
-  function writeAddress() {
+  function setAddress() {
     addressInput.value = Math.round(window.pin.mapPinMain.offsetLeft + window.pin.pinParams.MAIN_SIZE_WIDTH / 2) +
       ', ' + Math.round(window.pin.mapPinMain.offsetTop + window.pin.pinParams.MAIN_SIZE_HEIGHT);
   }
@@ -144,7 +144,7 @@
       window.pin.mapPinMain.style.left = x + 'px';
       window.pin.mapPinMain.style.top = y + 'px';
 
-      writeAddress();
+      setAddress();
     }
 
     /**
@@ -166,7 +166,7 @@
     mapPins: mapPins,
     mapMain: mapMain,
     mapFiltersSelect: mapFiltersSelect,
-    writeInactiveAdress: writeInactiveAdress,
+    setInactiveAdress: setInactiveAdress,
     isActivate: isActivate,
     mapPinMain: mapPinMain
   };

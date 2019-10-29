@@ -25,16 +25,16 @@
 
   /**
    * создаю копии метки
-   * @param {Object} newOffer
+   * @param {Object} offer
    * @return {node}
    */
-  function createOffer(newOffer) {
+  function createOffer(offer) {
     var offerPin = mapPinTemplate.cloneNode(true);
     var img = offerPin.querySelector('img');
-    offerPin.style.left = (newOffer.location.x - window.pin.pinParams.OFFER_SIZE_WIDTH / 2) + 'px';
-    offerPin.style.top = (newOffer.location.y - window.pin.pinParams.OFFER_SIZE_HEIGHT) + 'px';
-    img.src = newOffer.author.avatar;
-    img.alt = newOffer.offer.title;
+    offerPin.style.left = (offer.location.x - window.pin.pinParams.OFFER_SIZE_WIDTH / 2) + 'px';
+    offerPin.style.top = (offer.location.y - window.pin.pinParams.OFFER_SIZE_HEIGHT) + 'px';
+    img.src = offer.author.avatar;
+    img.alt = offer.offer.title;
 
     /**
      * открытие новой карточки при нажатии на маркер
@@ -47,7 +47,7 @@
         mapCard.remove();
       }
 
-      window.card.renderCard(newOffer);
+      window.card.renderCard(offer);
     }
 
     offerPin.addEventListener('click', onPinClick);
